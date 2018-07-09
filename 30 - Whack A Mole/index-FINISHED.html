@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack A Mole!</title>
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Whack-a-mole! <span class="score">0</span></h1>
+  <div class="start" >Start!</div>
+
+  <div class="game">
+    <div class="hole hole1">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole2">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole3">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole4">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole5">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole6">
+      <div class="mole"></div>
+    </div>
+  </div>
+    <dialog>
+      <button id="close" >x</button>
+      <p>Это окно, которое сделано на html5 и javascript</p>
+      
+    </dialog>
+
+<script>
+  const holes = document.querySelectorAll('.hole');
+  const scoreBoard = document.querySelector('.score');
+  const moles = document.querySelectorAll('.mole');
+  const start = document.querySelector('.start');
+  const dialog = document.querySelector("dialog");
+  console.log(dialog);
+ 
+  let lastHole;
+  let timeUp = false;
+  let score = 0;
+  let isPlay = false;
+  function randomTime(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
+
+  function randomHole(holes) {
+    const idx = Math.floor(Math.random() * holes.length);
+    const hole = holes[idx];
+    if (hole === lastHole) {
+      console.log('Ah nah thats the same one bud');
+      return randomHole(holes);
+    }
+    lastHole = hole;
+    return hole;
+  }
+
+  function peep() {
+    const time = randomTime(200, 1000);
+    const hole = randomHole(holes);
+    hole.classList.add('up');
+    setTimeout(() => {
+      hole.classList.remove('up');
+      if (!timeUp) peep();
+    }, time);
+  }
+
+  function showResult(){
+      dialog.innerHTML = `<button id="close" onclick="dialog.close()">x</button> 
+      <p>your score is ${scoreBoard.textContent}</p>`;
+      dialog.showModal();
+  }
+
+  function startGame() {
+    
+    if (isPlay == true){
+      console.log(isPlay);
+      timeUp = true;
+      isPlay = false;
+      start.textContent = "Start!";
+      showResult();
+      return;
+    }
+    isPlay = true;
+    scoreBoard.textContent = 0;
+    timeUp = false;
+    score = 0;
+    peep();
+    start.textContent = "Stop!";
+    
+   
+    setTimeout(() => {
+      isPlay= false;
+      timeUp = true;
+      start.textContent = "Start!";
+      showResult();
+    }, 10000);
+    
+    
+  }
+
+  function bonk(e) {
+    if(!e.isTrusted) return; // cheater!
+    score++;
+    this.parentNode.classList.remove('up');
+    scoreBoard.textContent = score;
+  }
+  start.addEventListener('click', startGame);
+  moles.forEach(mole => mole.addEventListener('click', bonk));
+
+</script>
+</body>
+</html>
